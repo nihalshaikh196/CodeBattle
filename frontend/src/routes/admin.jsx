@@ -1,7 +1,23 @@
-import React from 'react'
+import { Routes, Route } from "react-router-dom";
 
-export default function admin() {
+import Home from "../views/Admin/Home";
+import UploadProblem from "../views/Admin/UploadProblem";
+import Profile from "../views/Admin/Profile";
+import Contests from "../views/Admin/Contests";
+import Leaderboard from "../views/Admin/LeaderBoard";
+import Problems from "../views/Admin/Problems";
+
+function AdminRoutes() {
   return (
-    <div>admin</div>
-  )
+    <Routes>
+      <Route path="/home" element={<Home />} />
+      <Route path="/uploadProblem" element={<UploadProblem/>} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/contests" element={<Contests />} /> 
+      <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/problem/:problemId" element={<Problems />} />
+    </Routes>
+  );
 }
+
+export default AdminRoutes;

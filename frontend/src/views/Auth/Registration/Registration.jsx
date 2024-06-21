@@ -1,7 +1,83 @@
-import AuthNavbar from "../../../componenets/authNavbar";
+import { useState } from 'react';
+import AuthNavbar from "../../../components/authNavbar";
 import logo from "../../../assets/svg/logo_noText.svg";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
+import { registerAPI } from '../../../services/auth';
+
+
+
 function Register() {
+
+   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
+
+   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = 'First Name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last Name is required';
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password) newErrors.password = 'Password is required';
+    return newErrors;
+  };
+
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formErrors = validate();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return; 
+    }
+
+    try {
+      const response = await registerAPI(formData);
+      
+      if (response.status==201) {
+        // Handle successful response
+        setSuccessMessage('Account created successfully!');
+        setTimeout(() => {
+          setSuccessMessage(null);
+          navigate('/user/home');
+        }, 2000);
+
+      } else if (response.status==400) {
+        // Handle error response
+        setServerError(response.data.message);
+        setTimeout(() => {
+          setServerError(null);
+        }, 2000);
+      } else if (response.status==500) {
+        setServerError('An error occurred. Please try again.');
+         setTimeout(() => {
+          setServerError(null);
+        }, 2000);
+      }
+    } catch (error) {
+
+      setServerError('An error occurred. Please try again.');
+    }
+  };
+
   return (
     <>
     <AuthNavbar AuthMode={1}/>
@@ -18,8 +94,17 @@ function Register() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
-
+        <form className="space-y-6">
+          {successMessage && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+              {successMessage}
+            </div>
+          )}
+          {serverError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              {serverError}
+            </div>
+          )}
           <div>
             <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
               First Name
@@ -29,9 +114,12 @@ function Register() {
                 id="firstName"
                 name="firstName"
                 type="text"
+                value={formData.firstName}
+                onChange={handleChange}
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
+              {errors.firstName && <p className="text-red-600 text-sm">{errors.firstName}</p>}
             </div>
           </div>
 
@@ -44,9 +132,12 @@ function Register() {
                 id="lastName"
                 name="lastName"
                 type="text"
+                 value={formData.lastName}
+                onChange={handleChange}
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
+              {errors.lastName && <p className="text-red-600 text-sm">{errors.lastName}</p>}
             </div>
           </div>
 
@@ -60,9 +151,12 @@ function Register() {
                 name="email"
                 type="email"
                 autoComplete="email"
+                 value={formData.email}
+                onChange={handleChange}
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
+              {errors.email && <p className="text-red-600 text-sm">{errors.email}</p>}
             </div>
           </div>
 
@@ -78,15 +172,20 @@ function Register() {
                 name="password"
                 type="password"
                 autoComplete="current-password"
+                 value={formData.password}
+                onChange={handleChange}
                 required
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               />
+              {errors.password && <p className="text-red-600 text-sm">{errors.password}</p>}
+
             </div>
           </div>
 
           <div>
             <button
-              type="submit"
+              // type="submit"
+              onClick={handleSubmit}
               className="flex w-full justify-center rounded-md bg-purple-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Create Account
@@ -96,9 +195,7 @@ function Register() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-            <Link to="/auth/login">Log in</Link>
-          </a>
+            <Link className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"to="/auth/login">Log in</Link>
         </p>
       </div>
     </div>

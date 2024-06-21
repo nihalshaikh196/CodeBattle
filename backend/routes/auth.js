@@ -9,7 +9,6 @@ authRouter.post("/register", async (req, res) => {
   try {
     //get all data from the request body
     const { firstName, lastName, email, password } = req.body;
-    console.log(req.body);
     //check all fields are filled
     if (!(firstName && lastName && email && password)) {
       return res.status(400).json({
@@ -86,7 +85,7 @@ authRouter.post("/login", async (req, res) => {
    }
    //JWT token for authorization
    const token = jwt.sign(
-     { id: user._id, email, userType: "user" },
+     { id: user._id, email, userType: user.userType },
      process.env.JWT_SECRET,
      {
        expiresIn: "1d",
@@ -98,7 +97,7 @@ authRouter.post("/login", async (req, res) => {
 
    res.status(200).json({
      message: "Login successful!!!",
-     user: user,
+     userInfo: user,
      token: token,
    });
 });
