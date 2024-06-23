@@ -1,7 +1,8 @@
 import express from "express";
 const app = express();
 import DBConfig from "./database/db.js";
-import authRouter from "./routes/auth.js";
+import authRouter from "./routes/authRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 import cors from "cors";
 
 app.use(cors());
@@ -10,6 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 DBConfig();
 
 app.use("/auth", authRouter);
+app.use("/admin", adminRouter);
+
+
 app.get("/", (req, res) => {
   res.send("Server is Running!!!");
 });
