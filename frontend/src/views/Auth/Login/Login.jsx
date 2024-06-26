@@ -1,11 +1,12 @@
 import AuthNavbar from "../../../components/authNavbar";
 import logo from "../../../assets/svg/logo_noText.svg";
 import { Link,useNavigate } from "react-router-dom";
-import { loginAPI } from '../../../services/auth';
+import useAuthServices from '../../../services/auth';
 import { useState } from "react";
 
 function Login() {
 
+  const { loginAPI } = useAuthServices();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,6 +49,7 @@ function Login() {
       console.log(response);
       if (response.status==200) {
         // Handle successful response
+        console.log(response);
         setSuccessMessage('Welcome Back!');
         setTimeout(() => {
           setSuccessMessage(null);

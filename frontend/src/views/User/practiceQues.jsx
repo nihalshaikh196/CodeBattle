@@ -1,16 +1,24 @@
 import { useEffect, useState } from 'react';
 import UserNavbar from '../../components/UserNavbar';
 import { Link } from 'react-router-dom';
+import useUserServices from '../../services/user';
 
 const ProblemList = () => {
   const [problems, setProblems] = useState([]);
-
+  const { fetchAllProblems } = useUserServices();
   useEffect(() => {
     // Fetch the problems from the backend
-    fetch('http://localhost:3000/admin/problems')
-      .then(response => response.json())
-      .then(data => setProblems(data))
-      .catch(error => console.error('Error fetching problems:', error));
+    
+     const getProblem = async () => {
+      try {
+        const response = await fetchAllProblems();
+        setProblems(response);
+      } catch (error) {
+        // setError(error);
+        console.log(error);
+      }
+    };
+    getProblem();
   }, []);
 
   return (

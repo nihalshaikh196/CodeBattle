@@ -1,9 +1,11 @@
 import express from "express";
 import Problem from "../models/problemsSchema.js";
+import authenticateToken from "../middlewares/authenticateToken.js";
+import { isAdmin } from "../middlewares/authenticateUserType.js";
 
 
 
-const adminRouter = express.Router();
+const problemRoutes = express.Router();
 
 
 const validateProblemData = (data) => {
@@ -34,7 +36,7 @@ const validateProblemData = (data) => {
   return null;
 };
 
-adminRouter.post("/uploadProblem", async (req, res) => {
+problemRoutes.post("/uploadProblem",authenticateToken,isAdmin, async (req, res) => {
   const { title, description, difficulty, testCases, tags, constraints } =
     req.body;
 
@@ -72,10 +74,9 @@ const validationError = validateProblemData(req.body);
   }
 });
 
-export default adminRouter;
 
 
-adminRouter.get("/problems", async (req, res) => {
+problemRoutes.get("/getAll",authenticateToken, async (req, res) => {
   try {
     const problems = await Problem.find();
     res.status(200).json(problems);
@@ -86,7 +87,7 @@ adminRouter.get("/problems", async (req, res) => {
   }
 });
 
-adminRouter.get("/problems/:id", async (req, res) => {
+problemRoutes.get("/:id",authenticateToken, async (req, res) => {
   try {
     const problem = await Problem.findById(req.params.id);
     if (!problem) {
@@ -97,3 +98,5 @@ adminRouter.get("/problems/:id", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+export default problemRoutes;

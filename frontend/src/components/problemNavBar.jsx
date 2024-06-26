@@ -2,29 +2,31 @@ import { useState } from 'react';
 import { Dialog, DialogPanel } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import logo from '../assets/svg/logo.svg';
-import { Link } from 'react-router-dom';
+
 import PropTypes from 'prop-types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProblemNavBar({ ProblemName }) {
+  const {  logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="bg-purple-600">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <span  className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
             <img className="h-10 w-auto" src={logo} alt="Logo" />
-          </a>
+          </span>
         </div>
         <div className="hidden lg:flex lg:justify-center lg:flex-1">
           <h1 className="text-xl font-semibold text-white">{ProblemName}</h1>
         </div>
-        <div className="flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-gray-900">
-            <ArrowRightOnRectangleIcon className="h-6 w-6 text-white" aria-hidden="true" />
+        <div  className="hidden lg:flex lg:flex-1 lg:justify-end">
+          <span className="text-gray-900">
+            <ArrowRightOnRectangleIcon onClick={logout} className="h-6 w-6 text-white" aria-hidden="true" />
             <span className="sr-only">Log out</span>
-          </a>
+          </span>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -33,7 +35,7 @@ export default function ProblemNavBar({ ProblemName }) {
             onClick={() => setMobileMenuOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            <Bars3Icon className="h-6 w-6 text-white" aria-hidden="true" />
           </button>
         </div>
       </nav>
@@ -56,14 +58,11 @@ export default function ProblemNavBar({ ProblemName }) {
           </div>
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
-              <div className="py-6">
-                <Link
-                  to="/user/leaderboard"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
+              <div onClick={logout} className=" py-6">
+                
                 <ArrowRightOnRectangleIcon className="h-6 w-6 mr-2 inline text-white" aria-hidden="true" />
                   Log out
-                </Link>
+                
               </div>
             </div>
           </div>

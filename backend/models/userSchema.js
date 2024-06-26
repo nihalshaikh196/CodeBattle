@@ -25,6 +25,14 @@ const UserSchema = new mongoose.Schema({
     },
     registrationTime:{
         type:Date,
+    },
+    rating:{
+        type:Number,
+        default:0
+    },
+    refreshToken:{
+        type:String,
+        default:null
     }
 });
 

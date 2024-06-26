@@ -2,7 +2,8 @@ import express from "express";
 const app = express();
 import DBConfig from "./database/db.js";
 import authRouter from "./routes/authRoutes.js";
-import adminRouter from "./routes/adminRoutes.js";
+import problemRouter from "./routes/problemRoutes.js";
+import contestRouter from "./routes/contestRoutes.js";
 import cors from "cors";
 
 app.use(cors());
@@ -11,8 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 DBConfig();
 
 app.use("/auth", authRouter);
-app.use("/admin", adminRouter);
-
+app.use("/problem", problemRouter);
+app.use("/contest", contestRouter);
 
 app.get("/", (req, res) => {
   res.send("Server is Running!!!");

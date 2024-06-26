@@ -4,17 +4,25 @@ import { marked } from 'marked';
 import ProblemNavBar from '../../components/problemNavBar';
 import  MonacoEditor  from '@monaco-editor/react';
 import Loader from '../../components/loader';
+import useUserServices from '../../services/user';
+
 const Problem = () => {
+  const { fetchProblemWithID } = useUserServices();
   const { problemId } = useParams();
   const [problem, setProblem] = useState(null);
   const [language, setLanguage] = useState('cpp');
   const [code, setCode] = useState('// Your code here');
-
-  useEffect(() => {
-    fetch(`http://localhost:3000/admin/problems/${problemId}`)
-      .then(response => response.json())
-      .then(data => setProblem(data))
-      .catch(error => console.error('Error fetching problem:', error));
+  useEffect( () => {
+    const getProblem = async () => {
+    try {
+      const response = await fetchProblemWithID({ problemId });
+      setProblem(response);
+    } catch (error) {
+      // setError(error);
+      console.log(error);
+    }
+  };
+  getProblem();
   }, [problemId]);
 
   const handleLanguageChange = (e) => {
@@ -76,7 +84,7 @@ const Problem = () => {
             <div className="p-2">
               <label className="block mb-2">
                 Select Language:
-                <select value={language} onChange={handleLanguageChange} className="ml-2 p-1 border rounded-lg">
+                <select value={language} onChange={handleLanguageChange} className="ml-2 p-1 border w-28 rounded-lg">
                   <option value="javascript">JavaScript</option>
                   <option value="python">Python</option>
                   <option value="c">C</option>

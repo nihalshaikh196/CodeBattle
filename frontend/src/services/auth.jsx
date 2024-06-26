@@ -1,21 +1,49 @@
-import axios from "axios";
+import { useAuth } from '../contexts/AuthContext';
 
-const API_URL = "http://localhost:3000";
+ const useAuthServices = () => {
+  const { api, setUserData } = useAuth();
 
-export const registerAPI = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/auth/register`, data);
-      return response;
-    } catch (error) {
-        return error.response;
-    }
+   const registerAPI = async (data) => {
+  
+      try {
+        const response = await api.post(`/auth/register`, data);
+        return response;
+      } catch (error) {
+          return error.response;
+      }
+  };
+
+  const loginAPI = async (data) => {
+      try {
+        const response = await api.post(`/auth/login`, data);
+        setUserData({
+          id: response.data.userInfo._id,
+          email:response.data.userInfo.email,
+          userType: response.data.userInfo.userType,
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+        });
+        return response;
+      } catch (error) {
+          return error.response;
+      }
+  };
+
+
+  return { registerAPI,loginAPI };
 };
 
-export const loginAPI = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/auth/login`, data);
-      return response;
-    } catch (error) {
-        return error.response;
-    }
-};
+export default useAuthServices;
+
+
+// export async function logout() {
+//   try {
+//     await api.post('/logout');
+//   } catch (error) {
+//     console.error('Logout error:', error);
+//   } finally {
+//     localStorage.removeItem('accessToken');
+//     localStorage.removeItem('refreshToken');
+//     // setUser(null);
+//   }
+// }

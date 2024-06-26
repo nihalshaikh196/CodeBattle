@@ -7,10 +7,8 @@ import ForgotPassword from "../views/Auth/Login/ForgotPass.jsx";
 import GetCode from "../views/Auth/Login/GetCode.jsx";
 import ResetPassword from "../views/Auth/Login/ResetPass.jsx";
 
-import { RegistrationContextProvider } from "../contexts/registration.jsx";
 function AuthRoutes() {
   return (
-    <RegistrationContextProvider>
       <Routes>
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" exact element={<Register />} />
@@ -19,7 +17,6 @@ function AuthRoutes() {
         <Route path="/auth/ResetPassword" exact element={<ResetPassword />} />
         <Route path="/*" element={<Navigate to="/auth/login" replace />} />
       </Routes>
-    </RegistrationContextProvider>
   );
 }
 

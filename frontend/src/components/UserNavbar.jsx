@@ -21,6 +21,8 @@ import {
 } from '@heroicons/react/24/outline'
 import logo from "../assets/svg/logo.svg";
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
 
 const contestsSubmenu = [
   { name: 'Leaderboard', href: '#', icon: ChartPieIcon }
@@ -31,16 +33,17 @@ function classNames(...classes) {
 }
 
 export default function UserNavbar() {
+  const {  logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
     <header className="bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <span className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
             <img className="h-10 w-auto" src={logo} alt="" />
-          </a>
+          </span>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -93,24 +96,24 @@ export default function UserNavbar() {
             <UserIcon className="h-6 w-6" aria-hidden="true" />
             <span className="sr-only">Profile</span>
           </Link>
-          <a href="#" className="text-gray-900">
-            <ArrowRightOnRectangleIcon className="h-6 w-6" aria-hidden="true" />
+          <span  className="text-gray-900">
+            <ArrowRightOnRectangleIcon onClick={logout} className="h-6 w-6" aria-hidden="true" />
             <span className="sr-only">Log out</span>
-          </a>
+          </span>
         </PopoverGroup>
       </nav>
       <Dialog className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
+            <span href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
               <img
                 className="h-8 w-auto"
                 src={logo}
                 alt=""
               />
-            </a>
+            </span>
             <button
               type="button"
               className="-m-2.5 rounded-md p-2.5 text-gray-700"
@@ -148,22 +151,20 @@ export default function UserNavbar() {
                     </>
                   )}
                 </Disclosure>
-                <a
-                  href="#"
+                <span
                   className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
                   <UserIcon className="h-6 w-6 mr-2 inline" aria-hidden="true" />
                   Profile
-                </a>
+                </span>
               </div>
-              <div className="py-6">
-                <a
-                  href="#"
+              <div className="py-6" onClick={logout}>
+                <span
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
-                  <ArrowRightOnRectangleIcon className="h-6 w-6 mr-2 inline" aria-hidden="true" />
+                  <ArrowRightOnRectangleIcon  className="h-6 w-6 mr-2 inline" aria-hidden="true" />
                   Log out
-                </a>
+                </span>
               </div>
             </div>
           </div>

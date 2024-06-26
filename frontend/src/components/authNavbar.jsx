@@ -10,6 +10,7 @@ import {
 import logo from "../assets/svg/logo.svg";
 import {Link} from "react-router-dom";
 import PropTypes from 'prop-types';
+
 export default function AuthNavbar({AuthMode}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -17,10 +18,10 @@ export default function AuthNavbar({AuthMode}) {
     <header className="bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <span className="-m-1.5 p-1.5">
             <span className="sr-only">Code Battle</span>
             <img className="h-10 w-auto" src={logo} alt="" />
-          </a>
+          </span>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -34,31 +35,31 @@ export default function AuthNavbar({AuthMode}) {
         </div>
         <div className="hidden lg:flex lg:gap-x-12">
           
-          <a href="#" className="text-2xl font-bold font-mono  leading-6 text-purple-600">
+          <span className="text-2xl font-bold font-mono  leading-6 text-purple-600">
             Code Battle
-          </a>
+          </span>
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          <span className="text-sm font-semibold leading-6 text-gray-900">
             <Link to={AuthMode === 0 ? "/auth/register" : "/auth/login"}>
               {AuthMode === 0 ? "Sign Up" : "Log In"}
             </Link>
             <span aria-hidden="true">&rarr;</span>
-          </a>
+          </span>
         </div>
       </nav>
       <Dialog className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
+            <span  className="-m-1.5 p-1.5">
               <span className="sr-only">Code Battle</span>
               <img
                 className="h-8 w-auto"
                 src={logo}
                 alt=""
               />
-            </a>
+            </span>
             <button
               type="button"
               className="-m-2.5 rounded-md p-2.5 text-gray-700"
@@ -72,15 +73,14 @@ export default function AuthNavbar({AuthMode}) {
             <div className="-my-6 divide-y divide-gray-500/10">
               
               <div className="py-6">
-                <a
-                  href="#"
+                <span
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
                   <Link to={AuthMode === 0 ? "/auth/register" : "/auth/login"}>
                     {AuthMode === 0 ? "Sign Up" : "Log In"}
                   </Link>
                   
-                </a>
+                </span>
               </div>
             </div>
           </div>

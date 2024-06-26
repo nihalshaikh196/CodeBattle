@@ -2,12 +2,12 @@ import { useState } from 'react';
 import AuthNavbar from "../../../components/authNavbar";
 import logo from "../../../assets/svg/logo_noText.svg";
 import { Link,useNavigate } from "react-router-dom";
-import { registerAPI } from '../../../services/auth';
+import useAuthServices from '../../../services/auth';
 
 
 
 function Register() {
-
+  const { registerAPI } = useAuthServices();
    const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -57,7 +57,7 @@ function Register() {
         setSuccessMessage('Account created successfully!');
         setTimeout(() => {
           setSuccessMessage(null);
-          navigate('/user/home');
+          navigate('/auth/login');
         }, 2000);
 
       } else if (response.status==400) {
