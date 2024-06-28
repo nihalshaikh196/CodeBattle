@@ -6,10 +6,11 @@ const { api, } = useAuth();
   const fetchProfile = async () => {
     try {
       const response = await api.get('/user/profile');
+      // console.log(response);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Error fetching profile:', error);
-      return { success: false, error: error.response?.data?.message || 'Failed to fetch profile' };
+      return { success: false, error };
     }
   };
 

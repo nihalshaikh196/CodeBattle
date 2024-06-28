@@ -5,13 +5,20 @@ import ProblemNavBar from '../../components/problemNavBar';
 import  MonacoEditor  from '@monaco-editor/react';
 import Loader from '../../components/loader';
 import useUserServices from '../../services/user';
-
+import useCodeServices from '../../services/codeServices';
 const Problem = () => {
   const { fetchProblemWithID } = useUserServices();
   const { problemId } = useParams();
   const [problem, setProblem] = useState(null);
   const [language, setLanguage] = useState('cpp');
   const [code, setCode] = useState('// Your code here');
+  const [testCase, setTestCase] = useState('');
+  const [testResult, setTestResult] = useState(''); // State for test result
+  const [showTestCase, setShowTestCase] = useState(true); // State to toggle between test case and test result
+  const [success, setSuccess] = useState(true);
+  const{runCode}=useCodeServices();
+
+
   useEffect( () => {
     const getProblem = async () => {
     try {
@@ -30,11 +37,29 @@ const Problem = () => {
     setCode(getDefaultCode(e.target.value));
   };
 
+  const runTestCase=async()=>{
+    // console.log(code,language,testCase);
+    const response = await runCode(code, language, testCase);
+    const result = response.data.result;
+    // console.log(result);
+    setSuccess(result.success);
+    if (result.success) {
+      setTestResult(result.output);
+    } else {
+      const formattedResult = [
+        result.errors ? `<span style="color: red;">${result.errors}</span>` : '',
+        result.warnings ? `<span style="color:rgb(250 204 21);">${result.warnings}</span>` : ''
+      ].filter(Boolean).join('\n');
+      setTestResult(formattedResult);
+    }
+    setShowTestCase(false);
+  }
+
   const getDefaultCode = (lang) => {
     switch (lang) {
-      case 'javascript':
+      case 'js':
         return '// JavaScript code here\n\nfunction solution() {\n  // Your code here\n}\n';
-      case 'python':
+      case 'py':
         return '# Python code here\n\ndef solution():\n    # Your code here\n    pass\n';
       case 'c':
         return '// C code here\n\n#include <stdio.h>\n\nint main() {\n    // Your code here\n    return 0;\n}\n';
@@ -59,7 +84,7 @@ const Problem = () => {
     <div className="flex flex-col h-screen">
       <ProblemNavBar ProblemName={problem.title} />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-2/5 p-4 bg-gray-100 overflow-auto">
+        <div className="w-2/5 p-4  bg-gray-50 overflow-auto">
           <h2 className="text-xl font-bold mb-4">Problem Description</h2>
           <div className="p-4">
             <div className="mt-2">
@@ -85,8 +110,8 @@ const Problem = () => {
               <label className="block mb-2">
                 Select Language:
                 <select value={language} onChange={handleLanguageChange} className="ml-2 p-1 border w-28 rounded-lg">
-                  <option value="javascript">JavaScript</option>
-                  <option value="python">Python</option>
+                  <option value="js">JavaScript</option>
+                  <option value="py">Python</option>
                   <option value="c">C</option>
                   <option value="cpp">C++</option>
                   <option value="java">Java</option>
@@ -105,14 +130,35 @@ const Problem = () => {
               />
             </div>
           </div>
-
-          <div className="p-4 bg-gray-50 border-t border-gray-300 overflow-auto">
-            <h2 className="text-lg font-bold mb-2">Test Cases</h2>
-            <textarea className="w-full p-2 mb-2 border border-gray-300" placeholder="Enter your test cases..."></textarea>
-            <div className="flex space-x-2">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded">Run</button>
-              <button className="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
+          
+          <div className="p-4 bg-gray-50 border border-gray-300 overflow-auto h-56">
+            <div className="flex justify-between mb-2">
+              <div className="flex space-x-2">
+                <button onClick={() => setShowTestCase(true)} className={`px-4 py-2 rounded ${showTestCase ? 'bg-purple-400 text-white' : 'bg-gray-100'}`}>Test Cases</button>
+                <button onClick={() => setShowTestCase(false)} className={`px-4 py-2 rounded ${!showTestCase ? 'bg-purple-400 text-white' : 'bg-gray-100'}`}>Test Result</button>
+              </div>
+              <div className="flex space-x-2">
+                <button onClick={runTestCase} className="bg-purple-500 text-white px-4 py-2 rounded">Run</button>
+                <button className="bg-green-400 text-white px-4 py-2 rounded">Submit</button>
+              </div>
             </div>
+            {showTestCase ? (
+              <textarea value={testCase}
+                onChange={(e) => setTestCase(e.target.value)}
+                className="w-full h-32 p-2 mb-2 border border-gray-300" 
+                placeholder="Enter your test cases...">
+              </textarea>
+            ) : (
+              success?(<textarea value={testResult}
+                readOnly
+                className="w-full h-32 p-2 mb-2 border border-gray-300" 
+                placeholder="Output will be shown here...">
+              </textarea>):
+              (<pre
+                dangerouslySetInnerHTML={{ __html: testResult.replace(/\n/g, '<br>') }}
+                className=" text-sm w-full h-32 p-2 mb-2 bg-white border border-gray-300  min-h-[100px] overflow-auto whitespace-pre-wrap"
+              ></pre>   )          
+            )}
           </div>
         </div>
       </div>

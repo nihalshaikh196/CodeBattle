@@ -16,7 +16,7 @@ export default function AuthNavbar({AuthMode}) {
 
   return (
     <header className="bg-white">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+      <nav className="mx-auto flex items-center justify-between p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
           <span className="-m-1.5 p-1.5">
             <span className="sr-only">Code Battle</span>

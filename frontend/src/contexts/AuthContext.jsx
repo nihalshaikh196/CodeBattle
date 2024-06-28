@@ -63,6 +63,20 @@ export const AuthProvider = ({ children }) => {
     navigate('/auth/login');
   };
 
+  const isAuthenticated = async () => {
+    try {
+      const response = await api.get('/auth/protected');
+      // console.log(response);
+      setUser({ id: response.data.userId, userType: response.data.userType });
+      return response.data.userType;
+    } catch (error) {
+      navigate('/auth/login');
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const checkAuth = async () => {
     try {
       const response = await api.get('/auth/protected');
@@ -85,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     setUserData,
     logout,
     checkAuth,
+    isAuthenticated,
     api,
   };
 

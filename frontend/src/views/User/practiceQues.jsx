@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import UserNavbar from '../../components/UserNavbar';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import useUserServices from '../../services/user';
-
+import { useProtectedRoute } from '../../contexts/AuthContext';
 const ProblemList = () => {
+  const isAuthorized = useProtectedRoute(['user']);
+
   const [problems, setProblems] = useState([]);
   const { fetchAllProblems } = useUserServices();
   useEffect(() => {
     // Fetch the problems from the backend
-    
+    if(!isAuthorized) return(<Navigate to='/unauthorized'></Navigate>);
      const getProblem = async () => {
       try {
         const response = await fetchAllProblems();

@@ -1,32 +1,33 @@
 import express from "express";
-import User from "../models/userSchema";
-import authenticateToken from "../middlewares/authenticateToken";
-const userRoutes = express.Router();
+import User from "../models/userSchema.js";
+import authenticateToken from "../middlewares/authenticateToken.js";
+const userRouter = express.Router();
 
 
-userRoutes.get("/profile", authenticateToken, async (req, res) => {
+userRouter.get("/profile", authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password -refreshToken'); // Assuming authentication provides user ID
+    console.log("User:",req.user);
+    const user = await User.findById(req.user.userId).select('-password -refreshToken'); // Assuming authentication provides user ID
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
 
-    const profile = {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email, 
-    };
+    // const profile = {
+    //   firstName: user.firstName,
+    //   lastName: user.lastName,
+    //   email: user.email, 
+    // };
 
-    res.status(200).json(profile);
+    res.status(200).json(user);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-userRoutes.patch("/profile", authenticateToken, async (req, res) => {
+userRouter.patch("/profile", authenticateToken, async (req, res) => {
   const updates = Object.keys(req.body); // Extract properties to update
   const allowedUpdates = ["firstName", "lastName", "email"]; // Allowed fields for update
   const isValidUpdate = updates.every((update) =>
@@ -60,7 +61,7 @@ userRoutes.patch("/profile", authenticateToken, async (req, res) => {
 
 
 //Delete user account ((Will modify this later))
-userRoutes.delete("/profile", authenticateToken, async (req, res) => {
+userRouter.delete("/profile", authenticateToken, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.user._id);
 
@@ -78,4 +79,4 @@ userRoutes.delete("/profile", authenticateToken, async (req, res) => {
   }
 });
 
-export default userRoutes;
+export default userRouter;

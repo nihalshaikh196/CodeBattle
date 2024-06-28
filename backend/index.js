@@ -4,6 +4,8 @@ import DBConfig from "./database/db.js";
 import authRouter from "./routes/authRoutes.js";
 import problemRouter from "./routes/problemRoutes.js";
 import contestRouter from "./routes/contestRoutes.js";
+import userRouter from "./routes/userRoutes.js";
+import useCompilerRouter from "./routes/useCompilerRouter.js";
 import cors from "cors";
 
 app.use(cors());
@@ -14,7 +16,8 @@ DBConfig();
 app.use("/auth", authRouter);
 app.use("/problem", problemRouter);
 app.use("/contest", contestRouter);
-
+app.use("/user", userRouter);
+app.use("/compiler",useCompilerRouter)
 app.get("/", (req, res) => {
   res.send("Server is Running!!!");
 });

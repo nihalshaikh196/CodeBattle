@@ -8,6 +8,7 @@ import GetCode from "../views/Auth/Login/GetCode.jsx";
 import ResetPassword from "../views/Auth/Login/ResetPass.jsx";
 
 function AuthRoutes() {
+   
   return (
       <Routes>
         <Route path="/auth/login" element={<Login />} />
