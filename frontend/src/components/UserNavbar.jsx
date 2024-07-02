@@ -25,7 +25,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 
 const contestsSubmenu = [
-  { name: 'Leaderboard', href: '#', icon: ChartPieIcon }
+  { name: 'Contests', icon: ChartPieIcon }
 ]
 
 function classNames(...classes) {
@@ -59,6 +59,9 @@ export default function UserNavbar() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12 lg:ml-auto">
+           <Link to="/user/home" className="flex items-center text-m font-semibold leading-6 text-gray-900">
+            Home
+          </Link>
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-m font-semibold leading-6 text-gray-900">
               Contests
@@ -73,7 +76,7 @@ export default function UserNavbar() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <PopoverPanel className="absolute -left-32 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
+              <PopoverPanel className="absolute -left-56 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
                 <div className="p-4">
                   {contestsSubmenu.map((item) => (
                     <div
@@ -84,7 +87,7 @@ export default function UserNavbar() {
                         <item.icon className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" aria-hidden="true" />
                       </div>
                       <div className="flex-auto">
-                        <Link to="/user/leaderboard" className="block font-semibold text-gray-900">
+                        <Link to="/user/contests" className="block font-semibold text-gray-900">
                           {item.name}
                           <span className="absolute inset-0" />
                         </Link>

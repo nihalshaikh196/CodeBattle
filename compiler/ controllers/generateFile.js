@@ -41,7 +41,7 @@ const generateFile = async (code, language) => {
   fs.writeFileSync(filePath, code);
 
 //   console.log(filePath);
-  return filePath;
+  return {filePath,codeId};
 };
 
 export default generateFile;

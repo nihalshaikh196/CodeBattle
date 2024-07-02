@@ -13,13 +13,13 @@ if (!fs.existsSync(dirInput)) {
   fs.mkdirSync(dirInput, { recursive: true });
 }
 
-const generateInputFile = async (input) => {
-  const inputId = uuid();
+const generateInputFile = async (input,codeId) => {
+  const inputId = codeId;
   const fileName = `${inputId}.txt`;
 
   const filePath = path.join(dirInput, fileName);
 
-  fs.writeFileSync(filePath, input);
+  fs.writeFileSync(filePath, input, { flag: "w" });
 
   //   console.log(filePath);
   return filePath;

@@ -3,8 +3,8 @@ import Contest from "../models/contestsSchema.js";
 import Joi from "joi";
 import authenticateToken from "../middlewares/authenticateToken.js";
 import { isAdmin, isUser } from "../middlewares/authenticateUserType.js";
+import mongoose from "mongoose";
 const contestRoutes = express.Router();
-
 
 const contestValidationSchema = Joi.object({
   title: Joi.string().min(3).max(100).required(),
@@ -20,71 +20,71 @@ const validateContest = (data) => {
   return contestValidationSchema.validate(data);
 };
 
-
 contestRoutes.post("/createContest",authenticateToken,isAdmin, async (req, res) => {
+  const { error } = validateContest(req.body);
 
-    const { error } = validateContest(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
 
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
-
-    const { title, description, problems, startTime, endTime } = req.body;
-
-    try {
-      const contest = new Contest({
-        title,
-        description,
-        problems,
-        startTime,
-        endTime,
-      });
-
-      await contest.save();
-      res
-        .status(201)
-        .json({ message: "Contest created successfully", contest });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-});
-
-
-//Register in contest
-
-contestRoutes.post("/register/:id",authenticateToken,isUser, async (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
+  const { title, description, problems, startTime, endTime } = req.body;
 
   try {
-    const contest = await Contest.findById(id);
-    if (!contest) {
-      return res.status(404).json({ message: "Contest not found" });
-    }
+    const contest = new Contest({
+      title,
+      description,
+      problems,
+      startTime,
+      endTime,
+    });
 
-    if (new Date() > contest.startTime) {
-      return res
-        .status(400)
-        .json({ message: "Cannot register for an ongoing or past contest" });
-    }
-
-    if (contest.registeredUsers.includes(userId)) {
-      return res
-        .status(400)
-        .json({ message: "User already registered for the contest" });
-    }
-
-    contest.registeredUsers.push(userId);
     await contest.save();
-    res.status(200).json({ message: "User registered successfully" });
+    res.status(201).json({ message: "Contest created successfully", contest });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+//Register in contest
+
+contestRoutes.post(
+  "/register/:id",
+  authenticateToken,
+  isUser,
+  async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    try {
+      const contest = await Contest.findById(id);
+      if (!contest) {
+        return res.status(404).json({ message: "Contest not found" });
+      }
+
+      if (new Date() > contest.endTime) {
+        return res
+          .status(400)
+          .json({ message: "Cannot register for a past contest" });
+      }
+
+      if (contest.registeredUsers.includes(userId)) {
+        return res
+          .status(400)
+          .json({ message: "User already registered for the contest" });
+      }
+
+      contest.registeredUsers.push(userId);
+      await contest.save();
+      return res.status(200).json({ message: "User registered successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
 //Get contest by id
 
-contestRoutes.get("/getContest/:id",authenticateToken, async (req, res) => {
+contestRoutes.get("/getContest/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -101,12 +101,12 @@ contestRoutes.get("/getContest/:id",authenticateToken, async (req, res) => {
 });
 
 //Future Contests Route
-contestRoutes.get("/futureContests",authenticateToken, async (req, res) => {
+contestRoutes.get("/futureContests", authenticateToken, async (req, res) => {
   try {
     const currentTime = new Date();
     const futureContests = await Contest.find({
       startTime: { $gt: currentTime },
-    });
+    }).select(" title startTime endTime description");
     res.status(200).json(futureContests);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -114,13 +114,13 @@ contestRoutes.get("/futureContests",authenticateToken, async (req, res) => {
 });
 
 // Ongoing Contests Route
-contestRoutes.get("/ongoingContests",authenticateToken, async (req, res) => {
+contestRoutes.get("/ongoingContests", authenticateToken, async (req, res) => {
   try {
     const currentTime = new Date();
     const ongoingContests = await Contest.find({
       startTime: { $lte: currentTime },
       endTime: { $gt: currentTime },
-    });
+    }).select(" title startTime endTime description");
     res.status(200).json(ongoingContests);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -128,83 +128,121 @@ contestRoutes.get("/ongoingContests",authenticateToken, async (req, res) => {
 });
 
 // Past Contests Route
-contestRoutes.get("/pastContests",authenticateToken, async (req, res) => {
+contestRoutes.get("/pastContests", authenticateToken, async (req, res) => {
   try {
     const currentTime = new Date();
-    const pastContests = await Contest.find({ endTime: { $lte: currentTime } });
+    const pastContests = await Contest.find({
+      endTime: { $lte: currentTime },
+    }).select(" title startTime endTime description");
     res.status(200).json(pastContests);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-
 // Modify Contest Route
-contestRoutes.put('modifyContest/:id',authenticateToken,isAdmin, async (req, res) => {
-  const { id } = req.params;
-  const { title, description, problems, startTime, endTime } = req.body;
+contestRoutes.put(
+  "/modifyContest/:id",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    const { title, description, problems, startTime, endTime } = req.body;
 
-  try {
-    const contest = await Contest.findById(id);
-    if (!contest) {
-      return res.status(404).json({ message: 'Contest not found' });
+    try {
+      const contest = await Contest.findById(id);
+      if (!contest) {
+        return res.status(404).json({ message: "Contest not found" });
+      }
+
+      // Update the contest fields if they are provided in the request body
+      if (title) contest.title = title;
+      if (description) contest.description = description;
+      if (problems) contest.problems = problems;
+      if (startTime) contest.startTime = startTime;
+      if (endTime) contest.endTime = endTime;
+
+      await contest.save();
+      res
+        .status(200)
+        .json({ message: "Contest updated successfully", contest });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-
-    // Update the contest fields if they are provided in the request body
-    if (title) contest.title = title;
-    if (description) contest.description = description;
-    if (problems) contest.problems = problems;
-    if (startTime) contest.startTime = startTime;
-    if (endTime) contest.endTime = endTime;
-
-    await contest.save();
-    res.status(200).json({ message: 'Contest updated successfully', contest });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 // Delete Contest Route
-contestRoutes.delete('deleteContest/:id',authenticateToken,isAdmin, async (req, res) => {
-  const { id } = req.params;
+contestRoutes.delete(
+  "/deleteContest/:id",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ message: "Invalid contest ID format" });
+      return res.status(400).json({ message: "Invalid contest ID format" });
     }
-  try {
-    const contest = await Contest.findById(id);
-    if (!contest) {
-      return res.status(404).json({ message: 'Contest not found' });
-    }
+    try {
+      const contest = await Contest.findById(id);
+      if (!contest) {
+        return res.status(404).json({ message: "Contest not found" });
+      }
 
-    await contest.remove();
-    res.status(200).json({ message: 'Contest deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      await contest.remove();
+      res.status(200).json({ message: "Contest deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
+
+//check if user is registered
+contestRoutes.get(
+  "/checkIfRegistered/:id",
+  authenticateToken,
+  async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.user;
+    // console.log(id,userId);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid contest ID format" });
+    }
+    try {
+      const users = await Contest.findById(id).select(" registeredUsers");
+
+      if (!users.registeredUsers.includes(userId)) {
+        return res
+          .status(200)
+          .json({ success: false, message: "User not registered!" });
+      } else {
+        res.status(200).json({ success: true, message: "User registered!" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message, hehh: "fskfmksdm" });
+    }
+  }
+);
 
 //GetLeaderBoard
 
-contestRoutes.get("getLeaderBoard/:id",authenticateToken, async (req, res) => {
+contestRoutes.get("getLeaderBoard/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
     const contest = await Contest.findById(id).populate("leaderBoard.userId");
 
-    
     if (!contest) {
       return res.status(404).json({ message: "Contest not found" });
     }
 
     const leaderBoard = contest.leaderBoard.sort((a, b) => b.score - a.score);
 
-  
     const simplifiedLeaderBoard = leaderBoard.map((entry) => ({
       userId: entry.userId._id,
       username: entry.userId.username,
       score: entry.score,
-      solvedProblems: entry.solvedProblems.length, 
+      solvedProblems: entry.solvedProblems.length,
     }));
 
     res.status(200).json(simplifiedLeaderBoard);
@@ -212,7 +250,5 @@ contestRoutes.get("getLeaderBoard/:id",authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 export default contestRoutes;

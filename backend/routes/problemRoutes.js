@@ -36,7 +36,7 @@ const validateProblemData = (data) => {
   return null;
 };
 
-problemRoutes.post("/uploadProblem",authenticateToken,isAdmin, async (req, res) => {
+problemRoutes.post("/uploadProblem", async (req, res) => {
   const { title, description, difficulty, testCases, tags, constraints } =
     req.body;
 

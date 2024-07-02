@@ -9,7 +9,7 @@ import useCodeServices from '../../services/codeServices';
 
 const Problem = () => {
   const { fetchProblemWithID } = useUserServices();
-  const { problemId} = useParams();
+  const { problemId,contestId } = useParams();
   const [problem, setProblem] = useState(null);
   const [language, setLanguage] = useState('cpp');
   const [code, setCode] = useState('// Your code here');
@@ -17,7 +17,7 @@ const Problem = () => {
   const [testResult, setTestResult] = useState(''); // State for test result
   const [showTestCase, setShowTestCase] = useState(true); // State to toggle between test case and test result
   const [success, setSuccess] = useState(true);
-  const { runCode,submitPractice } = useCodeServices();
+  const { runCode,submitContest } = useCodeServices();
 
   useEffect(() => {
     const getProblem = async () => {
@@ -80,7 +80,7 @@ const Problem = () => {
   const handleSubmit = async () => {
     
       try {
-        const response=await submitPractice(code, language, problemId);
+        const response =await submitContest(code, language, problemId,contestId);
         // console.log(response.data);
         if (response) {
           if (response.data.success) {

@@ -6,7 +6,7 @@ const userRouter = express.Router();
 
 userRouter.get("/profile", authenticateToken, async (req, res) => {
   try {
-    console.log("User:",req.user);
+    // console.log("User:",req.user);
     const user = await User.findById(req.user.userId).select('-password -refreshToken'); // Assuming authentication provides user ID
 
     if (!user) {
