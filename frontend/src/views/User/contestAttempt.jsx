@@ -61,7 +61,7 @@ const ContestAttempt = () => {
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-600">Time Remaining</p>
-                <p className="text-base text-red-500">{timeRemaining}</p>
+                <p className="text-base font-bold text-red-500">{timeRemaining}</p>
               </div>
             </div>
             <div>

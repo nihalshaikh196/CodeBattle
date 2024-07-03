@@ -6,6 +6,7 @@ import MonacoEditor from '@monaco-editor/react';
 import Loader from '../../components/loader';
 import useUserServices from '../../services/user';
 import useCodeServices from '../../services/codeServices';
+import PopupDialog from "../../components/Popup";
 
 const Problem = () => {
   const { fetchProblemWithID } = useUserServices();
@@ -18,7 +19,7 @@ const Problem = () => {
   const [showTestCase, setShowTestCase] = useState(true); // State to toggle between test case and test result
   const [success, setSuccess] = useState(true);
   const { runCode,submitPractice } = useCodeServices();
-
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     const getProblem = async () => {
       try {
@@ -69,6 +70,10 @@ const Problem = () => {
     }
   };
 
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     setCode(getDefaultCode(language));
   }, []);
@@ -83,10 +88,11 @@ const Problem = () => {
         const response=await submitPractice(code, language, problemId);
         // console.log(response.data);
         if (response) {
-          if (response.data.success) {
-            setTestResult("All test cases passed successfully.");
-            setSuccess(true);
-          } else {
+            if (response.data.success) {
+              setTestResult("All test cases passed successfully.");
+              setSuccess(true);
+              setIsOpen(true);
+            } else {
             if(response.data.message ==="Execution error"){
               // console.log(response.data);
               const result = response.data.result;
@@ -206,6 +212,12 @@ const Problem = () => {
           </div>
         </div>
       </div>
+      <PopupDialog
+        isOpen={isOpen}
+        closeModal={closeModal}
+        popupMessage={"All test cases passed successfully."}
+        title={"Accepted!!!"}
+      />
     </div>
   );
 };

@@ -2,7 +2,7 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import PropTypes from 'prop-types';
-const PopupDialog = ({ isOpen, closeModal, popupMessage, isSuccess}) => {
+const PopupDialog = ({ isOpen, closeModal, popupMessage, title}) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -34,7 +34,7 @@ const PopupDialog = ({ isOpen, closeModal, popupMessage, isSuccess}) => {
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
-                  {isSuccess ? "Success" : "Warning"}
+                  {title}
                 </Dialog.Title>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
@@ -64,7 +64,7 @@ PopupDialog.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   popupMessage: PropTypes.string.isRequired,
-  isSuccess: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
 };
 
 export default PopupDialog;

@@ -4,6 +4,7 @@ import Joi from "joi";
 import authenticateToken from "../middlewares/authenticateToken.js";
 import { isAdmin, isUser } from "../middlewares/authenticateUserType.js";
 import mongoose from "mongoose";
+import updateLeaderBoard from "../controllers/leaderBoard.js";
 const contestRoutes = express.Router();
 
 const contestValidationSchema = Joi.object({
@@ -226,12 +227,15 @@ contestRoutes.get(
 
 //GetLeaderBoard
 
-contestRoutes.get("getLeaderBoard/:id", authenticateToken, async (req, res) => {
+contestRoutes.get("/getLeaderBoard/:id",  async (req, res) => {
   const { id } = req.params;
 
   try {
-    const contest = await Contest.findById(id).populate("leaderBoard.userId");
-
+    const contest = await Contest.findById(id).populate({
+      path: "leaderBoard.userId",
+      select: "firstName lastName rank",
+    });
+    console.log(contest);
     if (!contest) {
       return res.status(404).json({ message: "Contest not found" });
     }
@@ -239,7 +243,7 @@ contestRoutes.get("getLeaderBoard/:id", authenticateToken, async (req, res) => {
     const leaderBoard = contest.leaderBoard.sort((a, b) => b.score - a.score);
 
     const simplifiedLeaderBoard = leaderBoard.map((entry) => ({
-      userId: entry.userId._id,
+      user: entry.userId,
       username: entry.userId.username,
       score: entry.score,
       solvedProblems: entry.solvedProblems.length,
@@ -248,6 +252,19 @@ contestRoutes.get("getLeaderBoard/:id", authenticateToken, async (req, res) => {
     res.status(200).json(simplifiedLeaderBoard);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+contestRoutes.get("/updateLeaderBoard/:id",authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+   const LeaderBoard =  await updateLeaderBoard(id);
+
+    res.status(200).json({ message: "LeaderBoard Updated", leaderBoard:LeaderBoard });
+
+  } catch (error) {
+    
   }
 });
 

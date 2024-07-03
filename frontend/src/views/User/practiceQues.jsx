@@ -33,16 +33,22 @@ const ProblemList = () => {
     <div className="p-4 space-y-4">
       {problems.map((problem) => (
         <Link to={`/user/problem/practice/${problem._id}`} key={problem._id} className="block">
-        <div key={problem._id} className="flex justify-between items-center p-4 border border-gray-300 rounded-lg">
+        <div key={problem._id} className={`flex flex-auto justify-between items-center p-4 border ${problem.isSolved?'border-green-500':'border-gray-300'} rounded-lg`}>
           <div className="flex-1">
+            <div className='flex'>
             <h3 className="text-xl font-semibold">{problem.title}</h3>
+            <div className={`text-lg ml-5 font-bold text-green-500 `}>
+              {problem.isSolved? 'Solved' : ''}
+            </div>
+            </div>
             <div className="mt-2">
               {problem.tags.map((tag, index) => (
-                <span key={index} className="inline-block mr-2 px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                <span key={index} className="inline-block text-sm mr-2 px-2 py-1 bg-gray-100 text-gray-600 rounded">
                   {tag}
                 </span>
               ))}
             </div>
+             
           </div>
           <div className={`text-lg font-bold ${problem.difficulty === 'Easy' ? 'text-green-500' : problem.difficulty === 'Medium' ? 'text-yellow-500' : 'text-red-500'}`}>
             {problem.difficulty}

@@ -16,9 +16,9 @@ function UserRoutes() {
       <Route path="/contests" element={<Contests />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/practice" element={<PracticeQues />} /> 
-      <Route path="/leaderboard" element={<Leaderboard />} />
-      <Route path="/problem/practice/:problemId/" element={<Problem />} />
-      <Route path="/problem/contest/:contestId/:problemId/" element={<ContestProblem />} />
+      <Route path="/leaderboard/:contestId" element={<Leaderboard />} />
+      <Route path="/problem/practice/:problemId" element={<Problem />} />
+      <Route path="/problem/contest/:contestId/:problemId" element={<ContestProblem />} />
       <Route path="/contest/:contestId" element={<ContestDetails />} />
       <Route path="/contestAttempt/:contestId" element={<ContestAttempt/>} />
     </Routes>

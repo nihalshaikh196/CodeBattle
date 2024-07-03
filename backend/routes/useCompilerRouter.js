@@ -88,22 +88,30 @@ compilerRouter.post("/submitContest", authenticateToken, async (req, res) => {
     const newSubmission = {
       codeFileReference: compilerResult.filePath,
       submissionTime: new Date(),
-      testCasesPassed: compilerResult.results.filter((r) => r.passed).length,
-      status: compilerResult.success ? "Accepted" : "Wrong Answer",
+      testCasesPassed: !compilerResult.error
+        ? compilerResult.results.filter((r) => r.passed).length
+        : 0,
+      status: compilerResult.success
+        ? "Accepted"
+        : compilerResult.error
+        ? "Compilation Error"
+        : "Wrong Answer",
       result: compilerResult,
     };
 
-    console.log(contestSubmission);
+    // console.log(contestSubmission);
 
     if (problemIndex > -1) {
       // User has solved this problem before, add to existing submissions
       userSubmission.problemsSolved[problemIndex].submissions.push(
         newSubmission
       );
+      if(compilerResult.success)userSubmission.problemsSolved[problemIndex].solved = true;
     } else {
       // User hasn't solved this problem before, add new problem entry
       userSubmission.problemsSolved.push({
         problemId: problemId,
+        solved:compilerResult.success,
         submissions: [newSubmission],
       });
       contestSubmission.userSubmissions.push(userSubmission);
@@ -149,6 +157,7 @@ compilerRouter.post("/submitPractice", authenticateToken, async (req, res) => {
     }
 
     const compilerResult = await response.json();
+    console.log(compilerResult);
 
     // Find the user's submission document
     let submission = await Submission.findOne({ user: userId });
@@ -168,21 +177,28 @@ compilerRouter.post("/submitPractice", authenticateToken, async (req, res) => {
       submission.problemsSolved[problemIndex].submissions.push({
         codeFileReference: compilerResult.filePath,
         submissionTime: new Date(),
-        testCasesPassed: compilerResult.results.filter((r) => r.passed).length,
-        status: compilerResult.success ? "Accepted" : "Wrong Answer",
+        testCasesPassed: !compilerResult.error? compilerResult.results.filter((r) => r.passed).length:0,
+        status: compilerResult.success ? "Accepted" :compilerResult.error?"Compilation Error":"Wrong Answer",
         result: compilerResult,
       });
+      if(compilerResult.success){ submission.problemsSolved[problemIndex].solved = true; }
     } else {
       // User hasn't solved this problem before, add new problem entry
       submission.problemsSolved.push({
         problemId: problemId,
+        solved: compilerResult.success,
         submissions: [
           {
             codeFileReference: compilerResult.filePath,
             submissionTime: new Date(),
-            testCasesPassed: compilerResult.results.filter((r) => r.passed)
-              .length,
-            status: compilerResult.success ? "Accepted" : "Wrong Answer",
+            testCasesPassed: !compilerResult.error
+              ? compilerResult.results.filter((r) => r.passed).length
+              : 0,
+            status: compilerResult.success
+              ? "Accepted"
+              : compilerResult.error
+              ? "Compilation Error"
+              : "Wrong Answer",
             result: compilerResult,
           },
         ],

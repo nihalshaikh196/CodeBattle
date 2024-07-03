@@ -57,6 +57,7 @@ compilerRouter.post("/submit", async (req, res) => {
         return res.json({
           success: false,
           filePath:filePath,
+          error:true,
           message: "Execution error",
           result: {
             input: testCase.input,
@@ -85,6 +86,7 @@ compilerRouter.post("/submit", async (req, res) => {
     const overallResult = {
       success: allPassed,
       filePath: filePath,
+      error:false,
       message: allPassed ? "All test cases passed" : "Some test cases failed",
       results: results,
     };

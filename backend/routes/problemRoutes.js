@@ -2,7 +2,7 @@ import express from "express";
 import Problem from "../models/problemsSchema.js";
 import authenticateToken from "../middlewares/authenticateToken.js";
 import { isAdmin } from "../middlewares/authenticateUserType.js";
-
+import Submission from "../models/submissionSchema.js";
 
 
 const problemRoutes = express.Router();
@@ -76,17 +76,42 @@ const validationError = validateProblemData(req.body);
 
 
 
-problemRoutes.get("/getAll",authenticateToken, async (req, res) => {
+problemRoutes.get("/getAll", authenticateToken, async (req, res) => {
   try {
-    const problems = await Problem.find();
-    res.status(200).json(problems);
+    const { userId } = req.user;
+    const problems = await Problem.find().select("-testCases -constraints -description");
+    if (!problems) {
+      return res.status(404).json({ message: "No problems found" });
+    }
+
+    // Fetch user's submission data
+    const userSubmission = await Submission.findOne({ user: userId });
+
+    // Create a Set of solved problem IDs for quick lookup
+    const solvedProblemIds = new Set();
+    if (userSubmission) {
+      userSubmission.problemsSolved.forEach((problem) => {
+        if (problem.solved) {
+          solvedProblemIds.add(problem.problemId.toString());
+        }
+      });
+    }
+
+    // Add isSolved property to each problem
+    const problemsWithSolvedStatus = problems.map((problem) => ({
+      ...problem.toObject(),
+      isSolved: solvedProblemIds.has(problem._id.toString()),
+    }));
+
+    console.log(problemsWithSolvedStatus);
+
+    res.status(200).json(problemsWithSolvedStatus);
   } catch (error) {
     res
       .status(500)
       .json({ message: "Error fetching problems", error: error.message });
   }
 });
-
 problemRoutes.get("/:id",authenticateToken, async (req, res) => {
   try {
     const problem = await Problem.findById(req.params.id);

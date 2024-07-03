@@ -15,6 +15,10 @@ const submissionSchema = new Schema({
         ref: "Problem",
         required: true,
       },
+      solved: {
+        type: Boolean,
+        default: false,
+      },
       submissions: [
         {
           codeFileReference: {

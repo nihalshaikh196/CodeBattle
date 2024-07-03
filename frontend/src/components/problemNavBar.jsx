@@ -5,6 +5,7 @@ import logo from '../assets/svg/logo.svg';
 
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function ProblemNavBar({ ProblemName }) {
   const {  logout } = useAuth();
@@ -18,6 +19,9 @@ export default function ProblemNavBar({ ProblemName }) {
             <span className="sr-only">Your Company</span>
             <img className="h-10 w-auto" src={logo} alt="Logo" />
           </span>
+           <Link to="/user/home" className="flex items-center ml-5 text-m font-semibold leading-6 text-white">
+            Home
+          </Link>
         </div>
         <div className="hidden lg:flex lg:justify-center lg:flex-1">
           <h1 className="text-xl font-semibold text-white">{ProblemName}</h1>
