@@ -15,7 +15,7 @@ function AdminRoutes() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/contests" element={<Contests />} /> 
       <Route path="/leaderboard" element={<Leaderboard />} />
-      <Route path="/problem/:problemId" element={<Problems />} />
+      <Route path="/problems" element={<Problems />} />
     </Routes>
   );
 }

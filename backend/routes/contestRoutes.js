@@ -235,7 +235,7 @@ contestRoutes.get("/getLeaderBoard/:id",  async (req, res) => {
       path: "leaderBoard.userId",
       select: "firstName lastName rank",
     });
-    console.log(contest);
+    // console.log(contest);
     if (!contest) {
       return res.status(404).json({ message: "Contest not found" });
     }

@@ -36,10 +36,11 @@ const validateProblemData = (data) => {
   return null;
 };
 
-problemRoutes.post("/uploadProblem", async (req, res) => {
+problemRoutes.post("/uploadProblem",authenticateToken,isAdmin, async (req, res) => {
   const { title, description, difficulty, testCases, tags, constraints } =
     req.body;
 
+    console.log(req.body)
   //check all fields are filled
 const validationError = validateProblemData(req.body);
 

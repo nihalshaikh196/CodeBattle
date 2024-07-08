@@ -8,11 +8,12 @@ import useAuthServices from '../../../services/auth';
 
 function Register() {
   const { registerAPI } = useAuthServices();
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -37,7 +38,17 @@ function Register() {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    if (!formData.password) newErrors.password = 'Password is required';
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters long';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Confirm Password is required';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
     return newErrors;
   };
 
@@ -179,6 +190,26 @@ function Register() {
               />
               {errors.password && <p className="text-red-600 text-sm">{errors.password}</p>}
 
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
+                Confirm Password
+              </label>
+            </div>
+            <div className="mt-2">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              {errors.confirmPassword && <p className="text-red-600 text-sm">{errors.confirmPassword}</p>}
             </div>
           </div>
 
