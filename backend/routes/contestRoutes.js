@@ -5,6 +5,8 @@ import authenticateToken from "../middlewares/authenticateToken.js";
 import { isAdmin, isUser } from "../middlewares/authenticateUserType.js";
 import mongoose from "mongoose";
 import updateLeaderBoard from "../controllers/leaderBoard.js";
+import ContestSubmission from "../models/contestSubmissionsSchema.js";
+
 const contestRoutes = express.Router();
 
 const contestValidationSchema = Joi.object({
@@ -23,7 +25,7 @@ const validateContest = (data) => {
 
 contestRoutes.post("/createContest",authenticateToken,isAdmin, async (req, res) => {
   const { error } = validateContest(req.body);
-
+// console.log(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }
@@ -90,8 +92,7 @@ contestRoutes.get("/getContest/:id", authenticateToken, async (req, res) => {
 
   try {
     const contest = await Contest.findById(id)
-      .populate("problems")
-      .populate("leaderBoard.userId");
+      .populate("problems").select("-registeredUsers -leaderBoard");
     if (!contest) {
       return res.status(404).json({ message: "Contest not found" });
     }
@@ -147,6 +148,12 @@ contestRoutes.put(
   authenticateToken,
   isAdmin,
   async (req, res) => {
+
+     const { error } = validateContest(req.body);
+     // console.log(req.body);
+     if (error) {
+       return res.status(400).json({ error: error.details[0].message });
+     }
     const { id } = req.params;
     const { title, description, problems, startTime, endTime } = req.body;
 
@@ -255,17 +262,89 @@ contestRoutes.get("/getLeaderBoard/:id",  async (req, res) => {
   }
 });
 
-contestRoutes.get("/updateLeaderBoard/:id",authenticateToken, async (req, res) => {
+contestRoutes.post("/updateLeaderBoard/:id",authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-   const LeaderBoard =  await updateLeaderBoard(id);
+   await updateLeaderBoard(id);
 
-    res.status(200).json({ message: "LeaderBoard Updated", leaderBoard:LeaderBoard });
+    res.status(200).json({ success:true, message: "LeaderBoard Updated" });
 
   } catch (error) {
-    
+    res.status(500).json({ error: error.message });
   }
 });
+
+contestRoutes.get(
+  "/userSolvedProblems/:contestId",
+  authenticateToken,
+  async (req, res) => {
+    const { contestId } = req.params;
+    const { userId } = req.user;
+
+    if (!mongoose.Types.ObjectId.isValid(contestId)) {
+      return res.status(400).json({ message: "Invalid contest ID format" });
+    }
+
+    try {
+      // Find the contest
+      const contest = await Contest.findById(contestId);
+      if (!contest) {
+        return res.status(404).json({ message: "Contest not found" });
+      }
+
+      // Find the user's submissions for this contest
+      const contestSubmission = await ContestSubmission.findOne({ contestId });
+
+      if (!contestSubmission) {
+        return res.status(200).json({
+          contestId: contestId,
+          solvedProblems: {},
+        });
+      }
+
+      const userSubmission = contestSubmission.userSubmissions.find(
+        (sub) => sub.user.toString() === userId
+      );
+
+      if (!userSubmission) {
+        return res.status(200).json({
+          contestId: contestId,
+          solvedProblems: {},
+        });
+      }
+
+      // Create an object with solved status for each problem
+      const solvedStatus = userSubmission.problemsSolved.reduce(
+        (acc, problem) => {
+          acc[problem.problemId.toString()] = problem.solved;
+          return acc;
+        },
+        {}
+      );
+
+      // Get the list of all problem IDs in the contest
+      const allProblemsInContest = contest.problems.map((problem) =>
+        problem.toString()
+      );
+
+      // Ensure all contest problems are included in the response
+      const finalSolvedStatus = allProblemsInContest.reduce(
+        (acc, problemId) => {
+          acc[problemId] = solvedStatus[problemId] || false;
+          return acc;
+        },
+        {}
+      );
+
+      res.status(200).json({
+        contestId: contestId,
+        solvedProblems: finalSolvedStatus,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
 
 export default contestRoutes;

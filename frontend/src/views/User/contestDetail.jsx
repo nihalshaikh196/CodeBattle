@@ -70,33 +70,27 @@ const ContestDetails = () => {
       <UserNavbar />
       <div className="container mx-auto px-4 py-8 flex-grow">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-            <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h1 className="text-3xl font-bold text-purple-600">{contest.title}</h1>
-              <button
-                onClick={navigateToLeaderboard}
-                className={`py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 ${
-                  isContestOver
-                    ? 'bg-purple-500 hover:bg-purple-600 focus:ring-purple-400'
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-                disabled={!isContestOver}
-              >
-                {isContestOver ? 'View Leaderboard' : 'Leaderboard Unavailable'}
-              </button>
-            </div>
-            <p className="text-gray-600 mb-6">{contest.description}</p>
+          <div className="p-8">
+            <h1 className="text-4xl font-bold text-purple-600 mb-6">{contest.title}</h1>
+            <p className="text-gray-600 mb-8">{contest.description}</p>
             
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Start Time</p>
-                <p className="text-lg">{new Date(contest.startTime).toLocaleString()}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <p className="text-sm font-semibold text-purple-600 mb-2">Start Time</p>
+                <p className="text-lg text-gray-900">{new Date(contest.startTime).toLocaleString()}</p>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600">End Time</p>
-                <p className="text-lg">{new Date(contest.endTime).toLocaleString()}</p>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <p className="text-sm font-semibold text-purple-600 mb-2">End Time</p>
+                <p className="text-lg text-gray-900">{new Date(contest.endTime).toLocaleString()}</p>
+              </div>
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <p className="text-sm font-semibold text-purple-600 mb-2">Status</p>
+                <p className={`text-lg font-bold ${isContestOver ? 'text-red-500' : 'text-green-500'}`}>
+                  {isContestOver ? 'Contest Over' : 'Active'}
+                </p>
               </div>
             </div>
+
             <div className="flex space-x-4">
               <button
                 disabled={isRegistered || isContestOver}
@@ -109,7 +103,18 @@ const ContestDetails = () => {
                     : 'bg-purple-500 hover:bg-purple-600 focus:ring-purple-400'
                 }`}
               >
-                {isContestOver ? 'Completed' : isRegistered ? 'Registered' : 'Register for Contest'}
+                {isContestOver ? 'Contest Completed' : isRegistered ? 'Registered' : 'Register for Contest'}
+              </button>
+              <button
+                onClick={navigateToLeaderboard}
+                className={`flex-1 py-3 px-6 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-opacity-75 ${
+                  isContestOver
+                    ? 'bg-purple-500 hover:bg-purple-600 focus:ring-purple-400'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+                disabled={!isContestOver}
+              >
+                {isContestOver ? 'View Leaderboard' : 'Leaderboard Unavailable'}
               </button>
             </div>
           </div>

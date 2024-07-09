@@ -88,6 +88,18 @@ const { api, } = useAuth();
         } 
       
       }};
+
+      const getUserSolvedProblems = async (contestId) => {
+      try {
+        const response = await api.get(`/contest/userSolvedProblems/${contestId}`);
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        if (error.response) {
+          console.log (error.response.data.message || 'Failed to register for contest');
+        } 
+      
+      }};
       
 
       return {
@@ -96,7 +108,8 @@ const { api, } = useAuth();
         getPastContests,
         registerForContest,
         getContestDetails,
-        isUserRegistered
+        isUserRegistered,
+        getUserSolvedProblems
       };
 }
 

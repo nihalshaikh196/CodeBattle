@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import MdEditor from 'react-markdown-editor-lite';
+import  { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
-import { useNavigate } from 'react-router-dom';
-import 'react-markdown-editor-lite/lib/index.css';
+import MdEditor from 'react-markdown-editor-lite';
 import AdminNavBar from '../../components/adminNavbar';
-import useAdminServices from '../../services/adminServices';
 import PopupDialog from '../../components/Popup';
-function UploadProblem() {
+import useAdminServices from '../../services/adminServices';
+
+function EditProblem() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [constraints, setConstraints] = useState({ timeLimit: '1s', memoryLimit: '256MB' });
@@ -17,12 +17,38 @@ function UploadProblem() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [popupTitle, setPopupTitle] = useState('');
+  
   const navigate = useNavigate();
-  const { uploadProblem } = useAdminServices();
+  const { problemId } = useParams(); // Get the problem ID from the URL
+  const { getProblem, updateProblem } = useAdminServices();
 
   const mdParser = {
     render: marked
   };
+
+  useEffect(() => {
+    const fetchProblem = async () => {
+      try {
+        const problem = await getProblem(problemId);
+        console.log(problem);
+        if (problem) {
+          setTitle(problem.title);
+          setDescription(problem.description);
+          setConstraints(problem.constraints);
+          setTestCases(problem.testCases);
+          setDifficulty(problem.difficulty);
+          setTags(problem.tags);
+        }
+      } catch (error) {
+        console.error('Error fetching problem:', error);
+        setPopupTitle('Error');
+        setPopupMessage('Failed to fetch problem details');
+        setIsPopupOpen(true);
+      }
+    };
+
+    fetchProblem();
+  }, [problemId]);
 
   const handleEditorChange = ({ text }) => {
     setDescription(text);
@@ -71,16 +97,16 @@ function UploadProblem() {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await uploadProblem(title, description, difficulty, testCases, tags, constraints);
+    const result = await updateProblem(problemId, { title, description, difficulty, testCases, tags, constraints });
     if (result.success) {
       setPopupTitle('Success');
-      setPopupMessage('Problem uploaded successfully');
+      setPopupMessage('Problem updated successfully');
       setIsPopupOpen(true);
     } else {
       setPopupTitle('Error');
-      setPopupMessage('Failed to upload problem: ' + result.error);
+      setPopupMessage('Failed to update problem: ' + result.error);
       setIsPopupOpen(true);
     }
   };
@@ -133,6 +159,7 @@ function UploadProblem() {
                     <MdEditor
                       style={{ height: '400px', width: '100%' }}
                       renderHTML={(text) => mdParser.render(text)}
+                      value={description}
                       onChange={handleEditorChange}
                       onImageUpload={handleImageUpload}
                     />
@@ -285,4 +312,4 @@ function UploadProblem() {
     );
 }
 
-export default UploadProblem;
+export default EditProblem;

@@ -6,18 +6,21 @@ import MonacoEditor from '@monaco-editor/react';
 import Loader from '../../components/loader';
 import useUserServices from '../../services/user';
 import useCodeServices from '../../services/codeServices';
+import PopupDialog from "../../components/Popup";
+import { CodeBracketIcon, PlayIcon, CheckIcon, BeakerIcon, DocumentTextIcon } from '@heroicons/react/24/solid';
 
 const Problem = () => {
   const { fetchProblemWithID } = useUserServices();
-  const { problemId,contestId } = useParams();
+  const { problemId, contestId } = useParams();
   const [problem, setProblem] = useState(null);
   const [language, setLanguage] = useState('cpp');
   const [code, setCode] = useState('// Your code here');
   const [testCase, setTestCase] = useState('');
-  const [testResult, setTestResult] = useState(''); // State for test result
-  const [showTestCase, setShowTestCase] = useState(true); // State to toggle between test case and test result
+  const [testResult, setTestResult] = useState('');
+  const [showTestCase, setShowTestCase] = useState(true);
   const [success, setSuccess] = useState(true);
-  const { runCode,submitContest } = useCodeServices();
+  const { runCode, submitContest } = useCodeServices();
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const getProblem = async () => {
@@ -122,35 +125,44 @@ const Problem = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-gray-100">
       <ProblemNavBar ProblemName={problem.title} />
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-2/5 p-4 bg-gray-50 overflow-auto">
-          <h2 className="text-xl font-bold mb-4">Problem Description</h2>
-          <div className="p-4">
-            <div className="mt-2">
-              {problem.tags.map((tag, index) => (
-                <span key={index} className="inline-block mr-2 px-2 py-1 bg-gray-100 text-gray-600 rounded">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className={`mt-4 text-lg font-bold ${problem.difficulty === 'Easy' ? 'text-green-500' : problem.difficulty === 'Medium' ? 'text-yellow-500' : 'text-red-500'}`}>
-              Difficulty: {problem.difficulty}
-            </div>
-            <div className="mt-6">
-              <div className="prose" dangerouslySetInnerHTML={{ __html: marked(problem.description) }} />
+        <div className="w-2/5 p-4 overflow-auto">
+          <div className="bg-white rounded-lg shadow-lg h-full overflow-auto">
+            <h2 className="text-2xl font-bold p-4 border-b bg-purple-100 text-purple-800 sticky top-0">Problem Description</h2>
+            <div className="p-6">
+              <div className="flex flex-wrap gap-2 mb-4">
+                {problem.tags.map((tag, index) => (
+                  <span key={index} className="px-3 py-1 bg-purple-200 text-purple-800 rounded-full text-sm font-medium">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className={`mb-6 text-lg font-bold ${
+                problem.difficulty === 'Easy' ? 'text-green-600' : 
+                problem.difficulty === 'Medium' ? 'text-yellow-600' : 'text-red-600'
+              }`}>
+                Difficulty: {problem.difficulty}
+              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: marked(problem.description) }} />
             </div>
           </div>
         </div>
 
-        <div className="w-2/3 flex flex-col">
-          <div className="flex-1 bg-white border border-gray-300 overflow-auto">
-            <h2 className="text-xl font-bold p-2 border-b">Code Editor</h2>
-            <div className="p-2">
-              <label className="block mb-2">
-                Select Language:
-                <select value={language} onChange={handleLanguageChange} className="ml-2 p-1 border w-28 rounded-lg">
+        <div className="w-3/5 p-4 flex flex-col">
+          <div className="flex-1 bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+            <h2 className="text-xl font-bold p-4 bg-purple-100 text-purple-800 flex items-center">
+              <CodeBracketIcon className="w-6 h-6 mr-2" /> Code Editor
+            </h2>
+            <div className="flex items-center p-2 bg-gray-50">
+              <label className="flex ml-5 items-center">
+                <span className="mr-2 font-medium">Select Language:</span>
+                <select 
+                  value={language} 
+                  onChange={handleLanguageChange} 
+                  className="p-1 w-28 border rounded-lg bg-purple-50 text-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
                   <option value="js">JavaScript</option>
                   <option value="py">Python</option>
                   <option value="c">C</option>
@@ -158,54 +170,85 @@ const Problem = () => {
                   <option value="java">Java</option>
                 </select>
               </label>
-              <MonacoEditor
-                height="400px"
-                language={language}
-                value={code}
-                onChange={(value) => setCode(value)}
-                options={{
-                  selectOnLineNumbers: true,
-                  automaticLayout: true,
-                  minimap: { enabled: false },
-                }}
-              />
             </div>
+            <MonacoEditor
+              height={'600px'}
+              language={language}
+              value={code}
+              onChange={(value) => setCode(value)}
+              options={{
+                selectOnLineNumbers: true,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 12,
+              }}
+            />
           </div>
 
-          <div className="p-4 bg-gray-50 border border-gray-300 overflow-auto h-56">
-            <div className="flex justify-between mb-2">
+          <div className="mt-4 bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="flex justify-between items-center p-4 bg-purple-100">
               <div className="flex space-x-2">
-                <button onClick={() => setShowTestCase(true)} className={`px-4 py-2 rounded ${showTestCase ? 'bg-purple-400 text-white' : 'bg-gray-100'}`}>Test Cases</button>
-                <button onClick={() => setShowTestCase(false)} className={`px-4 py-2 rounded ${!showTestCase ? 'bg-purple-400 text-white' : 'bg-gray-100'}`}>Test Result</button>
+                <button 
+                  onClick={() => setShowTestCase(true)} 
+                  className={`px-4 py-2 rounded-lg flex items-center ${showTestCase ? 'bg-purple-600 text-white' : 'bg-purple-200 text-purple-800'}`}
+                >
+                  <DocumentTextIcon className="w-5 h-5 mr-2" /> Test Cases
+                </button>
+                <button 
+                  onClick={() => setShowTestCase(false)} 
+                  className={`px-4 py-2 rounded-lg flex items-center ${!showTestCase ? 'bg-purple-600 text-white' : 'bg-purple-200 text-purple-800'}`}
+                >
+                  <BeakerIcon className="w-5 h-5 mr-2" /> Test Result
+                </button>
               </div>
               <div className="flex space-x-2">
-                <button onClick={runTestCase} className="bg-purple-500 text-white px-4 py-2 rounded">Run</button>
-                <button onClick={handleSubmit} className="bg-green-400 text-white px-4 py-2 rounded">Submit</button>
+                <button 
+                  onClick={runTestCase} 
+                  className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200"
+                >
+                  <PlayIcon className="w-5 h-5 mr-2" /> Run
+                </button>
+                <button 
+                  onClick={handleSubmit} 
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center transition duration-200"
+                >
+                  <CheckIcon className="w-5 h-5 mr-2" /> Submit
+                </button>
               </div>
             </div>
-            {showTestCase ? (
-              <textarea value={testCase}
-                onChange={(e) => setTestCase(e.target.value)}
-                className="w-full h-32 p-2 mb-2 border border-gray-300" 
-                placeholder="Enter your test cases...">
-              </textarea>
-            ) : (
-              success ? (
-                <textarea value={testResult}
-                  readOnly
-                  className="w-full h-32 p-2 mb-2 border border-gray-300" 
-                  placeholder="Output will be shown here...">
-                </textarea>
+            <div className="p-4">
+              {showTestCase ? (
+                <textarea 
+                  value={testCase}
+                  onChange={(e) => setTestCase(e.target.value)}
+                  className="w-full h-32 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                  placeholder="Enter your test cases..."
+                />
               ) : (
-                <pre
-                  dangerouslySetInnerHTML={{ __html: testResult.replace(/\n/g, '<br>') }}
-                  className="text-sm w-full h-32 p-2 mb-2 bg-white border border-gray-300 min-h-[100px] overflow-auto whitespace-pre-wrap"
-                ></pre>
-              )
-            )}
+                success ? (
+                  <textarea 
+                    value={testResult}
+                    readOnly
+                    className="w-full h-32 p-2 border border-gray-300 rounded-lg bg-green-50 text-green-800" 
+                    placeholder="Output will be shown here..."
+                  />
+                ) : (
+                  <pre
+                    dangerouslySetInnerHTML={{ __html: testResult.replace(/\n/g, '<br>') }}
+                    className="w-full h-32 p-2 border border-gray-300 rounded-lg bg-red-50 text-red-800 overflow-auto whitespace-pre-wrap"
+                  />
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>
+      <PopupDialog
+        isOpen={isOpen}
+        closeModal={() => setIsOpen(false)}
+        popupMessage={"All test cases passed successfully."}
+        title={"Accepted!!!"}
+      />
     </div>
   );
 };

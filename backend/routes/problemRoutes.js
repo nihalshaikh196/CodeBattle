@@ -40,7 +40,7 @@ problemRoutes.post("/uploadProblem",authenticateToken,isAdmin, async (req, res) 
   const { title, description, difficulty, testCases, tags, constraints } =
     req.body;
 
-    console.log(req.body)
+    
   //check all fields are filled
 const validationError = validateProblemData(req.body);
 
@@ -74,6 +74,52 @@ const validationError = validateProblemData(req.body);
     });
   }
 });
+
+//update problem
+
+problemRoutes.put(
+  "/updateProblem/:id",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    const { title, description, difficulty, testCases, tags, constraints } =
+      req.body;
+
+    // Validate the updated data
+    const validationError = validateProblemData(req.body);
+
+
+    if (validationError) {
+      return res.status(400).json({
+        message: "Invalid update data",
+        error: validationError,
+      });
+    }
+
+    try {
+      const updatedProblem = await Problem.findByIdAndUpdate(
+        id,
+        { title, description, difficulty, testCases, tags, constraints },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedProblem) {
+        return res.status(404).json({ message: "Problem not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Problem updated successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Error updating problem",
+        error: error.message,
+      });
+    }
+  }
+);
 
 
 
