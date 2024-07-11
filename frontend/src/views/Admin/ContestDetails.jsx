@@ -45,7 +45,7 @@ const ContestDetails = () => {
               <div className="space-x-4">
                 <button
                   onClick={handleEdit}
-                  className="py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                  className="py-2 px-4 bg-purple-500 text-white font-semibold rounded-lg shadow-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-75"
                 >
                   Edit Contest
                 </button>

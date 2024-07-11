@@ -13,6 +13,7 @@ import EditProblem from "../views/Admin/EditProblem";
 function AdminRoutes() {
   return (
     <Routes>
+      
       <Route path="/home" element={<Home />} />
       <Route path="/uploadProblem" element={<UploadProblem/>} />
       <Route path="/profile" element={<Profile />} />

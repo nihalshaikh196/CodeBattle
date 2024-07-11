@@ -150,8 +150,6 @@ problemRoutes.get("/getAll", authenticateToken, async (req, res) => {
       isSolved: solvedProblemIds.has(problem._id.toString()),
     }));
 
-    console.log(problemsWithSolvedStatus);
-
     res.status(200).json(problemsWithSolvedStatus);
   } catch (error) {
     res

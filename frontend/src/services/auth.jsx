@@ -34,16 +34,3 @@ import { useAuth } from '../contexts/AuthContext';
 };
 
 export default useAuthServices;
-
-
-// export async function logout() {
-//   try {
-//     await api.post('/logout');
-//   } catch (error) {
-//     console.error('Logout error:', error);
-//   } finally {
-//     localStorage.removeItem('accessToken');
-//     localStorage.removeItem('refreshToken');
-//     // setUser(null);
-//   }
-// }

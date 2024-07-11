@@ -5,11 +5,13 @@ import Problem from "../models/problemsSchema.js"
 import Submission from "../models/submissionSchema.js";
 import ContestSubmission from "../models/contestSubmissionsSchema.js";
 
+const COMPILER_URL = process.env.OJ_COMPILER_URL;
+
 compilerRouter.post("/run", authenticateToken, async (req, res) => {
   const { code, language, input } = req.body;
   // if(input === undefined) 
   try {
-    const response = await fetch("http://localhost:8000/compiler/run", {
+    const response = await fetch(`${COMPILER_URL}/compiler/run`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, language, input }),
@@ -44,7 +46,7 @@ compilerRouter.post("/submitContest", authenticateToken, async (req, res) => {
     }
 
     // Submit the code to the compiler service
-    const response = await fetch("http://localhost:8000/compiler/submit", {
+    const response = await fetch(`${COMPILER_URL}/compiler/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, language, testCases: problem.testCases }),
@@ -72,7 +74,7 @@ compilerRouter.post("/submitContest", authenticateToken, async (req, res) => {
       (sub) => sub.user.toString() === userId
     );
 
-    console.log(userSubmission);
+    // console.log(userSubmission);
 
     if (!userSubmission) {
       // If user hasn't made any submissions in this contest, add them
@@ -146,7 +148,7 @@ compilerRouter.post("/submitPractice", authenticateToken, async (req, res) => {
       });
     }
 
-    const response = await fetch("http://localhost:8000/compiler/submit", {
+    const response = await fetch(`${COMPILER_URL}/compiler/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, language, testCases: problem.testCases }),
@@ -157,7 +159,7 @@ compilerRouter.post("/submitPractice", authenticateToken, async (req, res) => {
     }
 
     const compilerResult = await response.json();
-    console.log(compilerResult);
+    // console.log(compilerResult);
 
     // Find the user's submission document
     let submission = await Submission.findOne({ user: userId });
@@ -207,7 +209,7 @@ compilerRouter.post("/submitPractice", authenticateToken, async (req, res) => {
 
     // Save the updated submission document
     await submission.save();
-    console.log(compilerResult);
+    // console.log(compilerResult);
     res.status(200).json(
       compilerResult
     );

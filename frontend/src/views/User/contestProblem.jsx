@@ -163,11 +163,11 @@ const Problem = () => {
                   onChange={handleLanguageChange} 
                   className="p-1 w-28 border rounded-lg bg-purple-50 text-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
-                  <option value="js">JavaScript</option>
+                  {/* <option value="js">JavaScript</option>
                   <option value="py">Python</option>
-                  <option value="c">C</option>
+                  <option value="c">C</option> */}
                   <option value="cpp">C++</option>
-                  <option value="java">Java</option>
+                  {/* <option value="java">Java</option> */}
                 </select>
               </label>
             </div>

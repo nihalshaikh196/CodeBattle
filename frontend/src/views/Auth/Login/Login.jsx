@@ -48,8 +48,6 @@ function Login() {
       const response = await loginAPI(formData);
       console.log(response);
       if (response.status==200) {
-        // Handle successful response
-        console.log(response);
         setSuccessMessage('Welcome Back!');
         setTimeout(() => {
           setSuccessMessage(null);

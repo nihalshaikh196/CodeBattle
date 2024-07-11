@@ -11,11 +11,11 @@ function AuthRoutes() {
    
   return (
       <Routes>
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/register" exact element={<Register />} />
-        <Route path="/auth/forgotPassword" exact element={<ForgotPassword />} />
-        <Route path="/auth/getCode" exact element={<GetCode />} />
-        <Route path="/auth/ResetPassword" exact element={<ResetPassword />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" exact element={<Register />} />
+        <Route path="/forgotPassword" exact element={<ForgotPassword />} />
+        <Route path="/getCode" exact element={<GetCode />} />
+        <Route path="/ResetPassword" exact element={<ResetPassword />} />
         <Route path="/*" element={<Navigate to="/auth/login" replace />} />
       </Routes>
   );

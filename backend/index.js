@@ -8,7 +8,11 @@ import userRouter from "./routes/userRoutes.js";
 import useCompilerRouter from "./routes/useCompilerRouter.js";
 import cors from "cors";
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173", // replace with your frontend URL
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 DBConfig();

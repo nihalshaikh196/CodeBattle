@@ -13,9 +13,10 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
    const api = axios.create({
-    baseURL: 'http://localhost:3000', // Your API base URL
+    baseURL: import.meta.env.VITE_BACKEND_URL, // Your API base URL
   });
 
+  // console.log(import.meta.env.VITE_BACKEND_URL); // Your API base URL);
   // Intercept requests to add the access token
   api.interceptors.request.use(
     (config) => {
@@ -79,12 +80,13 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
+      
       const response = await api.get('/auth/protected');
-      // console.log(response);
       setUser({ id: response.data.userId, userType: response.data.userType });
+
     } catch (error) {
-      navigate('/auth/login');
       setUser(null);
+      navigate('/auth/login');
     } finally {
       setLoading(false);
     }

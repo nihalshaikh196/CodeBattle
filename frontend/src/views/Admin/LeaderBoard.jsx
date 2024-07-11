@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Loader from '../../components/loader';
 import AdminNavBar from '../../components/adminNavbar';
+import PopupDialog from '../../components/Popup';
 
 const LeaderBoard = () => {
   const { contestId } = useParams();
@@ -10,6 +11,9 @@ const LeaderBoard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { api } = useAuth();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [popupTitle, setPopupTitle] = useState('');
 
   const fetchLeaderboard = async () => {
     try {
@@ -32,15 +36,23 @@ const LeaderBoard = () => {
       setLoading(true);
       const response = await api.post(`/contest/updateLeaderBoard/${contestId}`);
       if (response.data.success) {
-        alert('Leaderboard generated successfully');
+        setPopupTitle('Success');
+        setPopupMessage('Leaderboard generated successfully');
+        setIsPopupOpen(true);
         fetchLeaderboard();
       } else {
-        alert('Failed to generate leaderboard');
+        setPopupTitle('Error');
+        setPopupMessage('Failed to generate leaderboard');
+        setIsPopupOpen(true);
       }
     } catch (err) {
       setError('Failed to generate leaderboard');
       setLoading(false);
     }
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
   };
 
   if (loading) return <Loader />;
@@ -65,6 +77,12 @@ const LeaderBoard = () => {
             </button>
           </div>
         </div>
+        <PopupDialog
+          isOpen={isPopupOpen}
+          closeModal={closePopup}
+          popupMessage={popupMessage}
+          title={popupTitle}
+        />
       </div>
     );
   }
@@ -100,6 +118,12 @@ const LeaderBoard = () => {
           </ul>
         </div>
       </div>
+      <PopupDialog
+        isOpen={isPopupOpen}
+        closeModal={closePopup}
+        popupMessage={popupMessage}
+        title={popupTitle}
+      />
     </div>
   );
 };
