@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         originalRequest._retry = true;
         try {
           const refreshToken = localStorage.getItem('refreshToken');
-          const response = await axios.post('http://localhost:3000/refresh-token', { refreshToken });
+          const response = await axios.post('https://codebattlein.tech/auth/refresh-token', { refreshToken });
           localStorage.setItem('accessToken', response.data.accessToken);
           localStorage.setItem('refreshToken', response.data.refreshToken);
           return api(originalRequest);
