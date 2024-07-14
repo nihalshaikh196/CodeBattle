@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  
+
    const api = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL, // Your API base URL
   });
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
         originalRequest._retry = true;
         try {
           const refreshToken = localStorage.getItem('refreshToken');
-          const response = await axios.post(`/auth/refresh-token`, { refreshToken });
+          const response = await axios.post('https://codebattlein.tech/auth/refresh-token', { refreshToken });
           localStorage.setItem('accessToken', response.data.accessToken);
           localStorage.setItem('refreshToken', response.data.refreshToken);
           return api(originalRequest);
