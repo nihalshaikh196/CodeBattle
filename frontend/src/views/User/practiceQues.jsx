@@ -24,7 +24,7 @@ const ProblemList = () => {
         // Check if problems are already cached
         if (problems.length === 0) {
           const response = await fetchAllProblems();
-          console.log(response);
+          // console.log(response);
           setProblems(response);
           setFilteredProblems(response);
         } else {

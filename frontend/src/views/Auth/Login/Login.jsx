@@ -46,7 +46,7 @@ function Login() {
 
     try {
       const response = await loginAPI(formData);
-      console.log(response);
+      // console.log(response);
       if (response.status==200) {
         setSuccessMessage('Welcome Back!');
         setTimeout(() => {
