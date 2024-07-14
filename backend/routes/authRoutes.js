@@ -117,7 +117,7 @@ authRouter.post('/refresh-token', async (req, res) => {
     const user = await User.findOne({ refreshToken });
     if (!user) return res.sendStatus(403);
 
-    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
+    jwt.verify(refreshToken, JWT_REFRESH_TOKEN_SECRET, (err, user) => {
       if (err) return res.sendStatus(403);
       const { accessToken, refreshToken: newRefreshToken } = generateTokens(user);
       user.refreshToken = newRefreshToken;
