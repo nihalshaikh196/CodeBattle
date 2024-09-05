@@ -30,7 +30,7 @@ function EditProblem() {
     const fetchProblem = async () => {
       try {
         const problem = await getProblem(problemId);
-        console.log(problem);
+        // console.log(problem);
         if (problem) {
           setTitle(problem.title);
           setDescription(problem.description);
